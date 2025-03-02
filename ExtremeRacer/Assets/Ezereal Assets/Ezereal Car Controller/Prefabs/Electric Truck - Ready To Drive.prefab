@@ -2520,6 +2520,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: 5
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -2531,6 +2533,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: -5
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -4119,6 +4123,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: 20
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -4130,6 +4136,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: -20
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -4141,6 +4149,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 0}
         Gain: 1
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -5984,6 +5994,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: 20
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -5995,6 +6007,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 2665944532482622193, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
         Gain: -20
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -6006,6 +6020,8 @@ MonoBehaviour:
       Input:
         InputAction: {fileID: 0}
         Gain: 1
+        LegacyInput: 
+        LegacyGain: 1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
