@@ -25,14 +25,13 @@ public class SingletonManager : MonoBehaviour
 
     private void Awake()
     {
-        // 중복된 인스턴스를 제거
-        if (_instance != this)
+        if (_instance == null)
         {
-            Destroy(gameObject);
+            _instance = this ;
         }
         else
         {
-            _instance = this;
+            Destroy(gameObject);
         }
     }
 
@@ -48,7 +47,7 @@ public class SingletonManager : MonoBehaviour
         if (!_singletons.ContainsKey(type))
         {
             _singletons[type] = instance;
-            DontDestroyOnLoad(instance.gameObject); // 등록된 싱글톤도 DontDestroyOnLoad 적용
+            DontDestroyOnLoad(instance);
             Debug.Log($"register {instance}");
         }
         else
@@ -69,5 +68,13 @@ public class SingletonManager : MonoBehaviour
             Debug.LogError("No singleton of type " + type + " is registered.");
             throw new System.Exception("Singleton not found");
         }
+    }
+
+    public void DebugSingleton()
+    {
+        Debug.Log(_instance.name);
+        Debug.Log(_singletons.Count);
+        foreach (var s in _singletons)
+            Debug.Log(s.Key.Name);
     }
 }
