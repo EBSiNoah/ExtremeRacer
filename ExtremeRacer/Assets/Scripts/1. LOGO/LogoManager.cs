@@ -5,6 +5,6 @@ public class LogoManager : MonoBehaviour
 {
     public void OnClickBtn()
     {
-        SceneManager.LoadScene("MAIN");
+        SceneManager.LoadScene("2.MAIN");
     }
 }

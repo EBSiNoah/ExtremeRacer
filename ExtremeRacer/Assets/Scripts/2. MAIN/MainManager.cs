@@ -5,6 +5,6 @@ public class MainManager : MonoBehaviour
 {
     public void OnClickBtn()
     {
-        SceneManager.LoadScene("MAIN");
+        SceneManager.LoadScene("3.InGame");
     }
 }

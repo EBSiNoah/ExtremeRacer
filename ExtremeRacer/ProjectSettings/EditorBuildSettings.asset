@@ -9,14 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/CarScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/LOGO.unity
+    path: Assets/Scenes/1. LOGO.unity
     guid: 3b97b7ac56cd50249a1f071b16a857ba
   - enabled: 1
-    path: Assets/Scenes/MAIN.unity
+    path: Assets/Scenes/2. MAIN.unity
     guid: 8fa790ba9f2d5b44194478ffc0a68d6e
   - enabled: 1
-    path: Assets/Scenes/GAME.unity
+    path: Assets/Scenes/3. InGAME.unity
     guid: 091e50f9d35d01649bfac4ec30751281
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.input.settings: {fileID: 11400000, guid: 6a5d0e493e3218c4d89d24a1c162b182, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 67d1239777fa0e944b8dee2f1d7df18d, type: 3}
   m_UseUCBPForAssetBundles: 0
