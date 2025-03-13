@@ -5,9 +5,14 @@ using UnityEngine.UI;
 
 public class BasePanel : MonoBehaviour
 {
+    // UICtrl 
     protected UICtrl uiCtrl;
 
+    // 기본 뒤로가기 버튼 - 안써도 됨
     public Button BackBtn;
+
+    // 이벤트 리스트 
+    protected virtual List<GameEventType> EventTypeList { get; } = new List<GameEventType>();
 
     void Start()
     {
