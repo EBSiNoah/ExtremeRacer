@@ -46,7 +46,7 @@ public class UICtrl : MonoBehaviour
         }
     }
 
-    public GameObject ShowPanel(PathEnum pathEnum, Transform parent)
+    public GameObject ShowPanel(PathEnum pathEnum, Transform parent, params object[] data)
     {
         // 패널은 enum으로 이름을 등록하고 프리팹은 Resources폴더안에 넣어서 로드하기
         string path = _panelPaths[pathEnum];
@@ -63,8 +63,7 @@ public class UICtrl : MonoBehaviour
         {
             var bp = panelInstance[pgo.name].GetComponent<BasePanel>();
             bp.transform.SetParent(parent, false);
-            bp.Init();
-            panelInstance[pgo.name].SetActive(true); // 패널 활성화
+            bp.Init(data);
             panelStack.Push(panelInstance[pgo.name]); // 패널 스택에 추가
             return panelInstance[pgo.name];
         }
@@ -73,6 +72,7 @@ public class UICtrl : MonoBehaviour
         {
             _createdPanel = Instantiate(pgo, parent);
             panelInstance.Add(pgo.name, _createdPanel);
+            _createdPanel.GetComponent<BasePanel>().Init(data);
             panelStack.Push(_createdPanel); // 패널 스택에 추가
             return _createdPanel; // 실제 생성된 패널 반환
         }

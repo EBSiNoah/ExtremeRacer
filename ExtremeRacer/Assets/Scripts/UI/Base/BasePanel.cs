@@ -16,18 +16,14 @@ public class BasePanel : MonoBehaviour
         BackBtn.onClick.AddListener(OnClickBackBtn);
     }
 
-    void OnEnable()
-    {
-        Init();
-    }
-
-    public void Init()
+    public void Init(params object[] data)
     {
         gameObject.SetActive(true);
-        InitChild();
+        InitChild(data);
     }
 
-    public virtual void InitChild() { }
+    public virtual void InitChild(params object[] data) { }
+
     public virtual void EndPanel()
     {
         gameObject.SetActive(false);
