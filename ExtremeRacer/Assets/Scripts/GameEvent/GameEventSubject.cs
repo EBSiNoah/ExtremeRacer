@@ -32,13 +32,12 @@ public class GameEventSubject
             gameEventHandlerList.Add(inEventType, eventList);
         }
 
-#if UNITY_EDITOR
+        // -------------------------------------------------- 
         if (eventList.Contains(inHandler))
         {
             Debug.LogError($"중복키 발생 - {inEventType}");
             return;
         }
-#endif
 
         eventList.Add(inHandler);
     }
@@ -205,7 +204,8 @@ public class GameEventSubject
         int maxCount = value.Count;
         for (int i = 0; i < maxCount; ++i)
         {
-            inGameEvent.Reset();
+            // ----------------------------------------
+            //inGameEvent.Reset();
 
             var de = value[i];
             de.Invoke(inGameEvent);

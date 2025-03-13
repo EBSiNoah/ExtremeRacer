@@ -21,6 +21,7 @@ public class LogoManager : MonoBehaviour
     public void OnClickBtn()
     {
         uiCtrl.ShowPanel(PathEnum.TestPanel1, canvas.transform, "hello world");
+        GameEventSubject.SendGameEvent(GameEventType.TEST_EVENT, "hello world");
         //SceneManager.LoadScene("2.MAIN");
     }
 
