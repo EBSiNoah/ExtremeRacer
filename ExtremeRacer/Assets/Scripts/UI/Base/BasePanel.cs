@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class BasePanel : MonoBehaviour
 {
-    public Button BackBtn;
-
     protected UICtrl uiCtrl;
+
+    public Button BackBtn;
 
     void Start()
     {

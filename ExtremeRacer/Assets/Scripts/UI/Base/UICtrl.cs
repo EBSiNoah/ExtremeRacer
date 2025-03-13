@@ -15,9 +15,21 @@ public class UICtrl : MonoBehaviour
     [SerializeField]
     private GameObject _createdPanel;
 
+    // 전체 패널 이름 보관
+    private Dictionary<PathEnum, string> _panelPaths = new Dictionary<PathEnum, string>();
+
     private void Awake()
     {
         SingletonManager.Instance.RegisterSingleton(this);
+
+        foreach (PathEnum type in System.Enum.GetValues(typeof(PathEnum)))
+        {
+            var pathAttribute = (PathAttribute)System.Attribute.GetCustomAttribute(type.GetType().GetField(type.ToString()), typeof(PathAttribute));
+            if (pathAttribute != null)
+            {
+                _panelPaths[type] = pathAttribute.Path;
+            }
+        }
     }
 
     public Transform GetCanvas(string sceneName)
@@ -34,9 +46,10 @@ public class UICtrl : MonoBehaviour
         }
     }
 
-    public GameObject ShowPanel(string path, Transform parent)
+    public GameObject ShowPanel(PathEnum pathEnum, Transform parent)
     {
         // 패널은 enum으로 이름을 등록하고 프리팹은 Resources폴더안에 넣어서 로드하기
+        string path = _panelPaths[pathEnum];
         GameObject pgo = Resources.Load<GameObject>(path);
         if (pgo == null)
         {

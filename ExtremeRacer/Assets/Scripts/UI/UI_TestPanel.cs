@@ -11,6 +11,6 @@ public class UI_TestPanel : BasePanel
     public void OnClickTextBtn()
     {
         testTransform = GameObject.Find("Canvas").transform;
-        uiCtrl.ShowPanel("UI/UI_TestPanel2", testTransform);
+        uiCtrl.ShowPanel(PathEnum.TestPanel2, testTransform);
     }
 }

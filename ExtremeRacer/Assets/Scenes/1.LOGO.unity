@@ -235,7 +235,7 @@ GameObject:
   - component: {fileID: 503773322}
   - component: {fileID: 503773321}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: LOGO
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -723,7 +723,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: MAIN
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -815,7 +815,7 @@ GameObject:
   - component: {fileID: 1881027625}
   - component: {fileID: 1881027624}
   m_Layer: 5
-  m_Name: w
+  m_Name: panel1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -948,7 +948,7 @@ GameObject:
   - component: {fileID: 1928499717}
   - component: {fileID: 1928499716}
   m_Layer: 5
-  m_Name: w (1)
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

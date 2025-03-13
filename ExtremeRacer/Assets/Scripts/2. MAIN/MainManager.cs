@@ -9,7 +9,7 @@ public class MainManager : MonoBehaviour
     {
         SingletonManager.Instance.DebugSingleton();
         var uictrl = SingletonManager.Instance.GetSingleton<UICtrl>();
-        uictrl.ShowPanel("UI/UI_TestPanel1", canvas.transform);
+        uictrl.ShowPanel(PathEnum.TestPanel1, canvas.transform);
     }
 
     public void OnClickBtn()

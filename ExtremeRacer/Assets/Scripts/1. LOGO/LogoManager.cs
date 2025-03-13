@@ -20,7 +20,7 @@ public class LogoManager : MonoBehaviour
 
     public void OnClickBtn()
     {
-        uiCtrl.ShowPanel("UI/UI_TestPanel1", canvas.transform);
+        uiCtrl.ShowPanel(PathEnum.TestPanel1, canvas.transform);
         //SceneManager.LoadScene("2.MAIN");
     }
 
