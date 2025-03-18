@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -384,6 +385,18 @@ namespace songkim
             // 차량 휠 메쉬의 움직임 표현
             AnimateWheelMeshes();
 
+        }
+
+
+        void OnSteer(InputValue turnValue)
+        {
+            Debug.Log($"steer {turnValue}");
+        }
+
+        void OnAccelerate(InputValue accelerationValue)
+        {
+            Debug.Log($"Aceel {accelerationValue}");
+           
         }
 
         // 차량 속도 UI 
