@@ -21,6 +21,8 @@ namespace songkim
         public int maxReverseSpeed = 45; // 자동차가 후진할 때 도달할 수 있는 최대 속도(km/h).
         [Range(1, 10)]
         public int accelerationMultiplier = 2; // 자동차 가속도 수치. 1 is a slow acceleration and 10 is the fastest.
+
+        public float horsePower = 100f; // 자동차 마력 수치.
         [Space(10)]
         [Range(10, 45)]
         public int maxSteeringAngle = 27; // 차량 핸들(바퀴) 돌아가는 최대 각도
@@ -34,7 +36,7 @@ namespace songkim
         [Range(1, 10)]
         public int handbrakeDriftMultiplier = 5; // 핸드브레이크 사용 시 자동차가 그립을 잃는 수치
         [Space(10)]
-        public Vector3 bodyMassCenter; // 차랴으이 질량 중심
+        public Vector3 bodyMassCenter; // 차량의 질량 중심
                                        // 차량 오브젝트의 x = 0, z = 0을 추천. 높이인 y축을 선택가능,
                                        // 갚이 높아질 수록 차량이 불안정해짐
                                        // 보통 0 - 1.5 사이를 추천
@@ -282,7 +284,7 @@ namespace songkim
             /*
             입력 제어 -> 나중에 input asset으로 변경하기
             */
-            if (useTouchControls && touchControlsSetup)
+            /*if (useTouchControls && touchControlsSetup)
             {
 
                 if (throttlePTI.buttonPressed)
@@ -330,15 +332,16 @@ namespace songkim
                     ResetSteeringAngle();
                 }
 
-            }
-            else
+            }*/
+
+            if (!(useTouchControls && touchControlsSetup))
             {
 
                 if (Input.GetKey(KeyCode.W))
                 {
-                    CancelInvoke("DecelerateCar");
+                    /*CancelInvoke("DecelerateCar");
                     deceleratingCar = false;
-                    GoForward();
+                    GoForward();*/
                 }
                 if (Input.GetKey(KeyCode.S))
                 {
@@ -393,10 +396,64 @@ namespace songkim
             Debug.Log($"steer {turnValue}");
         }
 
+        float currentAccelerationValue = 0f;
         void OnAccelerate(InputValue accelerationValue)
         {
-            Debug.Log($"Aceel {accelerationValue}");
-           
+            currentAccelerationValue = accelerationValue.Get<float>();
+            Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
+
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+            //GoForward();
+        }
+
+        private void FixedUpdate()
+        {
+            Accelerate();
+        }
+
+        void Accelerate()
+        {
+
+            Debug.Log($"{Mathf.Abs(localVelocityX)}");
+            // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
+            if (Mathf.Abs(localVelocityX) > 5f)
+            {
+                isDrifting = true;
+                DriftCarPS();
+            }
+            else
+            {
+                isDrifting = false;
+                DriftCarPS();
+            }
+
+            // Calculate how close the car is to top speed
+            // as a number from zero to one
+            var speedFactor = Mathf.InverseLerp(0, maxSpeed, carSpeed);
+
+            // Use that to calculate how much torque is available 
+            // (zero torque at top speed)
+            float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
+
+            if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed) {
+                frontLeftCollider.brakeTorque = 0f;
+                frontRightCollider.brakeTorque = 0f;
+                rearLeftCollider.brakeTorque = 0f;
+                rearRightCollider.brakeTorque = 0f;
+
+                //frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                //frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+            }
+            else
+            {
+                frontLeftCollider.motorTorque = 0;
+                frontRightCollider.motorTorque = 0;
+                rearLeftCollider.motorTorque = 0;
+                rearRightCollider.motorTorque = 0;
+            }
         }
 
         // 차량 속도 UI 
@@ -556,7 +613,7 @@ namespace songkim
         public void GoForward()
         {
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
-            if (Mathf.Abs(localVelocityX) > 2.5f)
+            if (Mathf.Abs(localVelocityX) > 3.5f)
             {
                 isDrifting = true;
                 DriftCarPS();
@@ -566,12 +623,14 @@ namespace songkim
                 isDrifting = false;
                 DriftCarPS();
             }
+
             // 스로틀 파워를 1까지 설정
             throttleAxis = throttleAxis + (Time.deltaTime * 3f);
             if (throttleAxis > 1f)
             {
                 throttleAxis = 1f;
             }
+
             // 자동차가 뒤로 가고 있다면 전진키가 브레이크를 작동시킴
             // 'z' 축의 로컬 속도가 -1f보다 작다면, 앞으로 가기 위해 양의 토크를 안전하게 적용함
             if (localVelocityZ < -1f)
@@ -580,6 +639,7 @@ namespace songkim
             }
             else
             {
+                Debug.Log($"{throttleAxis.ToString()}");
                 if (Mathf.RoundToInt(carSpeed) < maxSpeed)
                 {
                     // 최고속도에 도달하기 전에는 양의 토크가 모든 바퀴에 적용됨

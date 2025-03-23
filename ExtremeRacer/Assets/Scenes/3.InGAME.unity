@@ -147,8 +147,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 17803371}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1159306, y: -0.0000000041955643, z: 4.896962e-10, w: 0.99325734}
-  m_LocalPosition: {x: 0, y: -2.133529, z: 4.768585}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.45, y: -4.3305874, z: 14.475755}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -269,9 +269,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1519,7 +1519,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 190
   maxReverseSpeed: 45
-  accelerationMultiplier: 2
+  accelerationMultiplier: 10
+  horsePower: 1000
   maxSteeringAngle: 27
   steeringSpeed: 0.5
   brakeForce: 350
@@ -1541,7 +1542,7 @@ MonoBehaviour:
   RRWTireSkid: {fileID: 2033088219}
   useUI: 1
   carSpeedText: {fileID: 1129491260}
-  useSounds: 1
+  useSounds: 0
   carEngineSound: {fileID: 381361176}
   tireScreechSound: {fileID: 1424433733}
   useTouchControls: 0
@@ -3796,35 +3797,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.000000013581775
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.2527952
+      value: -3.0506816
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 8.501059
+      value: 7.677422
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9987518
+      value: 0.9950311
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.049948648
+      value: 0.09956492
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000000011684351
+      value: -0.0000000060513723
       objectReference: {fileID: 0}
     - target: {fileID: 1339649633832005654, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -5.843469e-11
+      value: 6.0551303e-10
       objectReference: {fileID: 0}
     - target: {fileID: 1833533765312951211, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: field of view
-      value: 75
+      value: 60.000004
       objectReference: {fileID: 0}
     - target: {fileID: 1833533765312951211, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: near clip plane
@@ -3880,7 +3881,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7114275331932080648, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: horsePower
-      value: 3000
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 8917895740616771620, guid: 9c8b1a896405b584e99933fce51d5688, type: 3}
       propertyPath: m_AnchorMax.y
