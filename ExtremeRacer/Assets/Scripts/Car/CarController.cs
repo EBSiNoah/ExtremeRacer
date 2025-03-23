@@ -13,7 +13,20 @@ namespace songkim
 {
     public class CarController : MonoBehaviour
     {
-        //[Header("CAR SETUP")]
+        #region variables
+
+        [Header("CONTROLLER SETUP")]
+        [Space(10)]
+        public SoundController soundController;
+        public LightController lightController;
+        public DriftController driftController;
+
+
+        [Header("Drive Type")]
+        [Space(10)]
+        public DriveType driveType = DriveType.RWD;
+
+        [Header("CAR SETUP")]
         [Space(10)]
         [Range(20, 190)]
         public int maxSpeed = 90; // 자동차가 도달할 수 있는 최대 속도(km/h).
@@ -21,13 +34,13 @@ namespace songkim
         public int maxReverseSpeed = 45; // 자동차가 후진할 때 도달할 수 있는 최대 속도(km/h).
         [Range(1, 10)]
         public int accelerationMultiplier = 2; // 자동차 가속도 수치. 1 is a slow acceleration and 10 is the fastest.
-
         public float horsePower = 100f; // 자동차 마력 수치.
+
         [Space(10)]
         [Range(10, 45)]
         public int maxSteeringAngle = 27; // 차량 핸들(바퀴) 돌아가는 최대 각도
-        [Range(0.1f, 1f)]
-        public float steeringSpeed = 0.5f; // 핸들 돌리는 속도
+        [Range(0.1f, 5f)]
+        public float steeringSpeed = 5f; // 핸들 돌리는 속도
         [Space(10)]
         [Range(100, 600)]
         public int brakeForce = 350; // 브레이크 힘 강도
@@ -64,7 +77,7 @@ namespace songkim
         //PARTICLE SYSTEMS
 
         [Space(20)]
-        //[Header("EFFECTS")]
+        [Header("EFFECTS")]
         [Space(10)]
         // 파티클 시스템을 사용할지 말지 변수
         public bool useEffects = false;
@@ -78,30 +91,10 @@ namespace songkim
         public TrailRenderer RLWTireSkid;
         public TrailRenderer RRWTireSkid;
 
-        //SPEED TEXT (UI)
-
-        [Space(20)]
-        //[Header("UI")]
-        [Space(10)]
-        // UI 사용 할지 말지
-        public bool useUI = false;
-        public Text carSpeedText; // 차량 속도 UI
-
-        //SOUNDS
-
-        [Space(20)]
-        //[Header("Sounds")]
-        [Space(10)]
-        // 차량 엔진 사운드나 차량 미끄러지는 사운드
-        public bool useSounds = false;
-        public AudioSource carEngineSound;
-        public AudioSource tireScreechSound;
-        float initialCarEngineSoundPitch; // 차량 엔진음 기본 높이 설정
-
         //CONTROLS
 
         [Space(20)]
-        //[Header("CONTROLS")]
+        [Header("CONTROLS")]
         [Space(10)]
         // 모바일 기기 대응
         public bool useTouchControls = false;
@@ -124,13 +117,19 @@ namespace songkim
         public bool isDrifting; // 현재 드리프트 중인지 여부
         [HideInInspector]
         public bool isTractionLocked; // 자동차의 트랙션이 잠겨 있는지 여부
+        [HideInInspector]
+        public float currentAccelerationValue = 0f; // 현재 차량의 엑셀 여부
+        [HideInInspector]
+        public float currentSteerAngle = 0f; // 현재 차량의 핸들 좌우 각도
+        [HideInInspector]
+        public float targetSteerAngle = 0f; // 차량의 핸들 좌우 각도 목표값
 
         //PRIVATE VARIABLES
 
         /*
         중요: 다음 변수들은 스크립트에 의해 자동으로 변하는 것을 제외한 직접적인 수정 금지
         */
-        Rigidbody carRigidbody; // 자동차 리지드바디
+        public Rigidbody carRigidbody; // 자동차 리지드바디
         float steeringAxis; // 핸들 수치 좌에서 우. -1 에서 1까지.
         float throttleAxis; // 쓰로틀 수치 후진에서 전진까지. -1 에서 1까지
         float driftingAxis;
@@ -151,6 +150,8 @@ namespace songkim
         float RLWextremumSlip;
         WheelFrictionCurve RRwheelFriction;
         float RRWextremumSlip;
+
+        #endregion
 
         void Start()
         {
@@ -188,40 +189,7 @@ namespace songkim
             RRwheelFriction.asymptoteValue = rearRightCollider.sidewaysFriction.asymptoteValue;
             RRwheelFriction.stiffness = rearRightCollider.sidewaysFriction.stiffness;
 
-            // 차량 엔진음 기본 높이 설정
-            if (carEngineSound != null)
-            {
-                initialCarEngineSoundPitch = carEngineSound.pitch;
-            }
-
-            // 0.1초마다 차량 속도에 따른 UI와 소리를 제어함
-            if (useUI)
-            {
-                InvokeRepeating("CarSpeedUI", 0f, 0.1f);
-            }
-            else if (!useUI)
-            {
-                if (carSpeedText != null)
-                {
-                    carSpeedText.text = "0";
-                }
-            }
-
-            if (useSounds)
-            {
-                InvokeRepeating("CarSounds", 0f, 0.1f);
-            }
-            else if (!useSounds)
-            {
-                if (carEngineSound != null)
-                {
-                    carEngineSound.Stop();
-                }
-                if (tireScreechSound != null)
-                {
-                    tireScreechSound.Stop();
-                }
-            }
+           
 
             if (!useEffects)
             {
@@ -281,58 +249,10 @@ namespace songkim
 
             //CAR PHYSICS
 
-            /*
-            입력 제어 -> 나중에 input asset으로 변경하기
-            */
-            /*if (useTouchControls && touchControlsSetup)
-            {
 
-                if (throttlePTI.buttonPressed)
-                {
-                    CancelInvoke("DecelerateCar");
-                    deceleratingCar = false;
-                    GoForward();
-                }
-                if (reversePTI.buttonPressed)
-                {
-                    CancelInvoke("DecelerateCar");
-                    deceleratingCar = false;
-                    GoReverse();
-                }
+            Accelerate();
 
-                if (turnLeftPTI.buttonPressed)
-                {
-                    TurnLeft();
-                }
-                if (turnRightPTI.buttonPressed)
-                {
-                    TurnRight();
-                }
-                if (handbrakePTI.buttonPressed)
-                {
-                    CancelInvoke("DecelerateCar");
-                    deceleratingCar = false;
-                    Handbrake();
-                }
-                if (!handbrakePTI.buttonPressed)
-                {
-                    RecoverTraction();
-                }
-                if ((!throttlePTI.buttonPressed && !reversePTI.buttonPressed))
-                {
-                    ThrottleOff();
-                }
-                if ((!reversePTI.buttonPressed && !throttlePTI.buttonPressed) && !handbrakePTI.buttonPressed && !deceleratingCar)
-                {
-                    InvokeRepeating("DecelerateCar", 0f, 0.1f);
-                    deceleratingCar = true;
-                }
-                if (!turnLeftPTI.buttonPressed && !turnRightPTI.buttonPressed && steeringAxis != 0f)
-                {
-                    ResetSteeringAngle();
-                }
-
-            }*/
+            Steer();
 
             if (!(useTouchControls && touchControlsSetup))
             {
@@ -352,11 +272,11 @@ namespace songkim
 
                 if (Input.GetKey(KeyCode.A))
                 {
-                    TurnLeft();
+                    //TurnLeft();
                 }
                 if (Input.GetKey(KeyCode.D))
                 {
-                    TurnRight();
+                    //TurnRight();
                 }
                 if (Input.GetKey(KeyCode.Space))
                 {
@@ -391,32 +311,32 @@ namespace songkim
         }
 
 
-        void OnSteer(InputValue turnValue)
-        {
-            Debug.Log($"steer {turnValue}");
-        }
+        #region receive message
 
-        float currentAccelerationValue = 0f;
         void OnAccelerate(InputValue accelerationValue)
         {
             currentAccelerationValue = accelerationValue.Get<float>();
-            Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
+            //Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
 
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
-            //GoForward();
         }
 
-        private void FixedUpdate()
+        void OnSteer(InputValue turnValue)
         {
-            Accelerate();
+            targetSteerAngle = turnValue.Get<float>() * maxSteeringAngle;
+            Debug.Log($"steer {targetSteerAngle}");
         }
+
+        #endregion
+
+
+        #region CAR METHODS
 
         void Accelerate()
         {
-
-            Debug.Log($"{Mathf.Abs(localVelocityX)}");
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
+            //Debug.Log($"{Mathf.Abs(localVelocityX)}");
             if (Mathf.Abs(localVelocityX) > 5f)
             {
                 isDrifting = true;
@@ -436,90 +356,60 @@ namespace songkim
             // (zero torque at top speed)
             float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
 
-            if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed) {
-                frontLeftCollider.brakeTorque = 0f;
-                frontRightCollider.brakeTorque = 0f;
-                rearLeftCollider.brakeTorque = 0f;
-                rearRightCollider.brakeTorque = 0f;
 
-                //frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                //frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+            if (localVelocityZ < -1f)
+            {
+                Brakes();
             }
             else
             {
-                frontLeftCollider.motorTorque = 0;
-                frontRightCollider.motorTorque = 0;
-                rearLeftCollider.motorTorque = 0;
-                rearRightCollider.motorTorque = 0;
+                if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed)
+                {
+                    frontLeftCollider.brakeTorque = 0f;
+                    frontRightCollider.brakeTorque = 0f;
+                    rearLeftCollider.brakeTorque = 0f;
+                    rearRightCollider.brakeTorque = 0f;
+
+                    switch (driveType)
+                    {
+                        case DriveType.RWD:
+                            rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            break;
+                        case DriveType.FWD:
+                            frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            break;
+                        case DriveType.AWD:
+                            frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
+                            break;
+                    }
+                }
+                else
+                {
+                    frontLeftCollider.motorTorque = 0;
+                    frontRightCollider.motorTorque = 0;
+                    rearLeftCollider.motorTorque = 0;
+                    rearRightCollider.motorTorque = 0;
+                }
             }
         }
 
-        // 차량 속도 UI 
-        public void CarSpeedUI()
+        void Steer()
         {
+            float adjustedspeedFactor = Mathf.InverseLerp(20, maxSpeed, carSpeed); //minimum speed affecting steerAngle is 20
+            float adjustedTurnAngle = targetSteerAngle * (1 - adjustedspeedFactor); //based on current speed.
+            currentSteerAngle = Mathf.Lerp(currentSteerAngle, adjustedTurnAngle, Time.deltaTime * steeringSpeed);
 
-            if (useUI)
-            {
-                try
-                {
-                    float absoluteCarSpeed = Mathf.Abs(carSpeed);
-                    carSpeedText.text = Mathf.RoundToInt(absoluteCarSpeed).ToString();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(ex);
-                }
-            }
-
+            frontLeftCollider.steerAngle = currentSteerAngle;
+            frontRightCollider.steerAngle = currentSteerAngle;
         }
 
-        // 자동차 소리를 속도에 따라서 제어, 느리면 낮은 피치 빠르면 높은 피치 
-        // 초기 값 + 속도 / 100f 
-        // 드리프트 소리
-        public void CarSounds()
-        {
 
-            if (useSounds)
-            {
-                try
-                {
-                    if (carEngineSound != null)
-                    {
-                        float engineSoundPitch = initialCarEngineSoundPitch + (Mathf.Abs(carRigidbody.linearVelocity.magnitude) / 25f);
-                        carEngineSound.pitch = engineSoundPitch;
-                    }
-                    if ((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f))
-                    {
-                        if (!tireScreechSound.isPlaying)
-                        {
-                            tireScreechSound.Play();
-                        }
-                    }
-                    else if ((!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f))
-                    {
-                        tireScreechSound.Stop();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(ex);
-                }
-            }
-            else if (!useSounds)
-            {
-                if (carEngineSound != null && carEngineSound.isPlaying)
-                {
-                    carEngineSound.Stop();
-                }
-                if (tireScreechSound != null && tireScreechSound.isPlaying)
-                {
-                    tireScreechSound.Stop();
-                }
-            }
-
-        }
+        #endregion
 
         //
         //STEERING METHODS
@@ -551,7 +441,7 @@ namespace songkim
         }
 
         // 손 때고 기본값으로 돌아옴
-        public void ResetSteeringAngle()
+        public void ResetSteeringAngle() 
         {
             if (steeringAxis < 0f)
             {
