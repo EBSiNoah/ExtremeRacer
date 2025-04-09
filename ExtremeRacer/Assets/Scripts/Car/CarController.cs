@@ -38,9 +38,9 @@ namespace songkim
 
         [Space(10)]
         [Range(10, 45)]
-        public int maxSteeringAngle = 27; // 차량 핸들(바퀴) 돌아가는 최대 각도
-        [Range(0.1f, 5f)]
-        public float steeringSpeed = 5f; // 핸들 돌리는 속도
+        public int maxSteeringAngle = 35; // 차량 핸들(바퀴) 돌아가는 최대 각도 (27 기본)
+        [Range(0.1f, 10f)]
+        public float steeringSpeed = 10f; // 핸들 돌리는 속도
         [Space(10)]
         [Range(100, 600)]
         public int brakeForce = 350; // 브레이크 힘 강도
@@ -119,6 +119,8 @@ namespace songkim
         public bool isTractionLocked; // 자동차의 트랙션이 잠겨 있는지 여부
         [HideInInspector]
         public float currentAccelerationValue = 0f; // 현재 차량의 엑셀 여부
+        [HideInInspector]
+        public float currentReverseValue = 0f; // 현재 차량의 엑셀 여부(후진)
         [HideInInspector]
         public float currentSteerAngle = 0f; // 현재 차량의 핸들 좌우 각도
         [HideInInspector]
@@ -250,18 +252,22 @@ namespace songkim
             //CAR PHYSICS
 
 
-            Accelerate();
+            //Accelerate();
+
+            //Reverse();
 
             Steer();
+
+           
 
             if (!(useTouchControls && touchControlsSetup))
             {
 
                 if (Input.GetKey(KeyCode.W))
                 {
-                    /*CancelInvoke("DecelerateCar");
+                    CancelInvoke("DecelerateCar");
                     deceleratingCar = false;
-                    GoForward();*/
+                    GoForward();
                 }
                 if (Input.GetKey(KeyCode.S))
                 {
@@ -278,6 +284,7 @@ namespace songkim
                 {
                     //TurnRight();
                 }
+
                 if (Input.GetKey(KeyCode.Space))
                 {
                     CancelInvoke("DecelerateCar");
@@ -299,15 +306,12 @@ namespace songkim
                 }
                 if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f)
                 {
-                    ResetSteeringAngle();
+                    //ResetSteeringAngle();
                 }
-
             }
-
 
             // 차량 휠 메쉬의 움직임 표현
             AnimateWheelMeshes();
-
         }
 
 
@@ -316,7 +320,16 @@ namespace songkim
         void OnAccelerate(InputValue accelerationValue)
         {
             currentAccelerationValue = accelerationValue.Get<float>();
-            //Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
+            Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
+
+            CancelInvoke("DecelerateCar");
+            deceleratingCar = false;
+        }
+
+        void OnReverse(InputValue reverseValue)
+        {
+            currentReverseValue = reverseValue.Get<float>() * -1;
+            Debug.Log("Reverse: " + currentReverseValue.ToString());
 
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
@@ -325,7 +338,7 @@ namespace songkim
         void OnSteer(InputValue turnValue)
         {
             targetSteerAngle = turnValue.Get<float>() * maxSteeringAngle;
-            Debug.Log($"steer {targetSteerAngle}");
+            //Debug.Log($"steer {targetSteerAngle}");
         }
 
         #endregion
@@ -337,7 +350,7 @@ namespace songkim
         {
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
             //Debug.Log($"{Mathf.Abs(localVelocityX)}");
-            if (Mathf.Abs(localVelocityX) > 5f)
+            if (Mathf.Abs(localVelocityX) > 10f)
             {
                 isDrifting = true;
                 DriftCarPS();
@@ -365,28 +378,7 @@ namespace songkim
             {
                 if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed)
                 {
-                    frontLeftCollider.brakeTorque = 0f;
-                    frontRightCollider.brakeTorque = 0f;
-                    rearLeftCollider.brakeTorque = 0f;
-                    rearRightCollider.brakeTorque = 0f;
-
-                    switch (driveType)
-                    {
-                        case DriveType.RWD:
-                            rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            break;
-                        case DriveType.FWD:
-                            frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            break;
-                        case DriveType.AWD:
-                            frontLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            frontRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            rearLeftCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            rearRightCollider.motorTorque = currentMotorTorque * currentAccelerationValue;
-                            break;
-                    }
+                    ApplyTorque(currentMotorTorque* currentAccelerationValue);
                 }
                 else
                 {
@@ -397,6 +389,77 @@ namespace songkim
                 }
             }
         }
+
+        void Reverse()
+        {
+            // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
+            //Debug.Log($"{Mathf.Abs(localVelocityX)}");
+            if (Mathf.Abs(localVelocityX) > 5f)
+            {
+                isDrifting = true;
+                DriftCarPS();
+            }
+            else
+            {
+                isDrifting = false;
+                DriftCarPS();
+            }
+
+            // Calculate how close the car is to top speed
+            // as a number from zero to one
+            var speedFactor = Mathf.InverseLerp(0, maxReverseSpeed, carSpeed);
+
+            // Use that to calculate how much torque is available 
+            // (zero torque at top speed)
+            float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
+
+
+            if (localVelocityZ > 1f)
+            {
+                //Brakes();
+            }
+            else
+            {
+                if (currentReverseValue < 0f && Mathf.RoundToInt(carSpeed) < maxReverseSpeed)
+                {
+                    ApplyTorque(currentMotorTorque * currentReverseValue);
+                }
+               /* else
+                {
+                    frontLeftCollider.motorTorque = 0;
+                    frontRightCollider.motorTorque = 0;
+                    rearLeftCollider.motorTorque = 0;
+                    rearRightCollider.motorTorque = 0;
+                }*/
+            }
+        }
+
+        void ApplyTorque(float torque)
+        {
+            frontLeftCollider.brakeTorque = 0f;
+            frontRightCollider.brakeTorque = 0f;
+            rearLeftCollider.brakeTorque = 0f;
+            rearRightCollider.brakeTorque = 0f;
+
+            switch (driveType)
+            {
+                case DriveType.RWD:
+                    rearLeftCollider.motorTorque = torque;
+                    rearRightCollider.motorTorque = torque;
+                    break;
+                case DriveType.FWD:
+                    frontLeftCollider.motorTorque = torque;
+                    frontRightCollider.motorTorque = torque;
+                    break;
+                case DriveType.AWD:
+                    frontLeftCollider.motorTorque = torque;
+                    frontRightCollider.motorTorque = torque;
+                    rearLeftCollider.motorTorque = torque;
+                    rearRightCollider.motorTorque = torque;
+                    break;
+            }
+        }
+
 
         void Steer()
         {
@@ -503,7 +566,7 @@ namespace songkim
         public void GoForward()
         {
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
-            if (Mathf.Abs(localVelocityX) > 3.5f)
+            if (Mathf.Abs(localVelocityX) > 15f)
             {
                 isDrifting = true;
                 DriftCarPS();

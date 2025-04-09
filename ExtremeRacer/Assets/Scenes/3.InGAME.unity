@@ -1534,11 +1534,11 @@ MonoBehaviour:
   maxReverseSpeed: 45
   accelerationMultiplier: 10
   horsePower: 1000
-  maxSteeringAngle: 27
-  steeringSpeed: 1
-  brakeForce: 350
+  maxSteeringAngle: 35
+  steeringSpeed: 10
+  brakeForce: 600
   decelerationMultiplier: 2
-  handbrakeDriftMultiplier: 5
+  handbrakeDriftMultiplier: 1
   bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 1514630946}
   frontLeftCollider: {fileID: 1656569672}
@@ -1563,6 +1563,7 @@ MonoBehaviour:
   isDrifting: 0
   isTractionLocked: 0
   currentAccelerationValue: 0
+  currentReverseValue: 0
   currentSteerAngle: 0
   targetSteerAngle: 0
   carRigidbody: {fileID: 0}
@@ -1605,7 +1606,7 @@ MonoBehaviour:
   ctrl: {fileID: 420922848}
   useUI: 1
   carSpeedText: {fileID: 1129491260}
-  useSounds: 1
+  useSounds: 0
   carEngineSound: {fileID: 381361176}
   tireScreechSound: {fileID: 1424433733}
 --- !u!1 &430981429
