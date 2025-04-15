@@ -252,11 +252,11 @@ namespace songkim
             //CAR PHYSICS
 
 
-            //Accelerate();
+            Accelerate();
 
             //Reverse();
 
-            Steer();
+            //Steer();
 
            
 
@@ -265,24 +265,24 @@ namespace songkim
 
                 if (Input.GetKey(KeyCode.W))
                 {
-                    CancelInvoke("DecelerateCar");
+                    /*CancelInvoke("DecelerateCar");
                     deceleratingCar = false;
-                    GoForward();
+                    GoForward();*/
                 }
                 if (Input.GetKey(KeyCode.S))
                 {
-                    CancelInvoke("DecelerateCar");
+                    /*CancelInvoke("DecelerateCar");
                     deceleratingCar = false;
-                    GoReverse();
+                    GoReverse();*/
                 }
 
                 if (Input.GetKey(KeyCode.A))
                 {
-                    //TurnLeft();
+                    TurnLeft();
                 }
                 if (Input.GetKey(KeyCode.D))
                 {
-                    //TurnRight();
+                    TurnRight();
                 }
 
                 if (Input.GetKey(KeyCode.Space))
@@ -306,7 +306,7 @@ namespace songkim
                 }
                 if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f)
                 {
-                    //ResetSteeringAngle();
+                    ResetSteeringAngle();
                 }
             }
 
@@ -320,7 +320,7 @@ namespace songkim
         void OnAccelerate(InputValue accelerationValue)
         {
             currentAccelerationValue = accelerationValue.Get<float>();
-            Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
+            //Debug.Log("Acceleration: " + currentAccelerationValue.ToString());
 
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
@@ -329,7 +329,7 @@ namespace songkim
         void OnReverse(InputValue reverseValue)
         {
             currentReverseValue = reverseValue.Get<float>() * -1;
-            Debug.Log("Reverse: " + currentReverseValue.ToString());
+            //Debug.Log("Reverse: " + currentReverseValue.ToString());
 
             CancelInvoke("DecelerateCar");
             deceleratingCar = false;
@@ -338,7 +338,7 @@ namespace songkim
         void OnSteer(InputValue turnValue)
         {
             targetSteerAngle = turnValue.Get<float>() * maxSteeringAngle;
-            //Debug.Log($"steer {targetSteerAngle}");
+            Debug.Log($"steer {targetSteerAngle}");
         }
 
         #endregion
@@ -350,7 +350,7 @@ namespace songkim
         {
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
             //Debug.Log($"{Mathf.Abs(localVelocityX)}");
-            if (Mathf.Abs(localVelocityX) > 10f)
+            if (Mathf.Abs(localVelocityX) > 3)
             {
                 isDrifting = true;
                 DriftCarPS();
@@ -361,31 +361,67 @@ namespace songkim
                 DriftCarPS();
             }
 
-            // Calculate how close the car is to top speed
-            // as a number from zero to one
-            var speedFactor = Mathf.InverseLerp(0, maxSpeed, carSpeed);
 
-            // Use that to calculate how much torque is available 
-            // (zero torque at top speed)
-            float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
+            Debug.Log($"{localVelocityZ}");
 
+            
 
-            if (localVelocityZ < -1f)
+            // 전진 키 눌림
+            if (currentAccelerationValue > 0)
             {
-                Brakes();
-            }
-            else
-            {
-                if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed)
+                // Calculate how close the car is to top speed
+                // as a number from zero to one
+                var speedFactor = Mathf.InverseLerp(0, maxSpeed, carSpeed);
+                // Use that to calculate how much torque is available 
+                // (zero torque at top speed)
+                float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
+
+                if (localVelocityZ < -1f)
                 {
-                    ApplyTorque(currentMotorTorque* currentAccelerationValue);
+                    Brakes();
                 }
                 else
                 {
-                    frontLeftCollider.motorTorque = 0;
-                    frontRightCollider.motorTorque = 0;
-                    rearLeftCollider.motorTorque = 0;
-                    rearRightCollider.motorTorque = 0;
+                    // 전진
+                    if (currentAccelerationValue > 0f && Mathf.RoundToInt(carSpeed) < maxSpeed)
+                    {
+                        ApplyTorque(currentMotorTorque * currentAccelerationValue);
+                    }
+                    // 최고속도 제한
+                    else
+                    {
+                        frontLeftCollider.motorTorque = 0;
+                        frontRightCollider.motorTorque = 0;
+                        rearLeftCollider.motorTorque = 0;
+                        rearRightCollider.motorTorque = 0;
+                    }
+                }
+            } 
+            // 후진 키 눌림
+            if(currentReverseValue < 0)
+            {
+                var speedFactor = Mathf.InverseLerp(0, maxReverseSpeed, carSpeed);
+                float currentMotorTorque = Mathf.Lerp(horsePower, 0, speedFactor);
+
+                if (localVelocityZ > 1f)
+                {
+                    Brakes();
+                }
+                else
+                {
+                    // 후진
+                    if (currentReverseValue < 0f && Mathf.RoundToInt(carSpeed) < maxReverseSpeed)
+                    {
+                        ApplyTorque(currentMotorTorque * currentReverseValue);
+                    }
+                    // 최고속도 제한
+                    else
+                    {
+                        frontLeftCollider.motorTorque = 0;
+                        frontRightCollider.motorTorque = 0;
+                        rearLeftCollider.motorTorque = 0;
+                        rearRightCollider.motorTorque = 0;
+                    }
                 }
             }
         }
@@ -566,7 +602,7 @@ namespace songkim
         public void GoForward()
         {
             // 차량의 x축에 힘이 2.5f 이상 가해지면 차량은 트랙션을 잃었다는 뜻이고 그러면 파티클로 연기 시스템이 나오기 시작함
-            if (Mathf.Abs(localVelocityX) > 15f)
+            if (Mathf.Abs(localVelocityX) > 2.5f)
             {
                 isDrifting = true;
                 DriftCarPS();
